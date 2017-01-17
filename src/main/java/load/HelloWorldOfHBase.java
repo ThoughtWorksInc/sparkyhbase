@@ -13,7 +13,7 @@ import java.util.NavigableMap;
 
 /* How to run me
 java -cp ca-1.0-SNAPSHOT.jar:`hbase classpath` load.HelloWorldOfHBase
-*/  
+*/
 public class HelloWorldOfHBase {
     public static void main(String[] args) {
         System.out.println("hello world");
