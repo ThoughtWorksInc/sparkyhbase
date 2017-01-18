@@ -16,15 +16,21 @@ import scala.Tuple2;
  */
 /*
  spark-submit --jars `echo /usr/lib/hbase/*.jar | sed 's/ /,/g'` \
-     --class com.thoughtworks.sparkyhbase.CreateHFiles sparkyhbase-1.0-SNAPSHOT.jar
+     --class com.thoughtworks.sparkyhbase.CreateHFiles sparkyhbase-1.0-SNAPSHOT.jar \
+     input_path output_path
  */
 public class CreateHFiles {
     public static void main(String[] args) {
         if (args.length < 1) {
-            System.err.println("Need input data as argument");
+            System.err.println("Need input data as 1st argument");
+            System.exit(1);
+        }
+        if (args.length < 2) {
+            System.err.println("Need output data as 2nd argument");
             System.exit(1);
         }
         String input_path = args[0];
+        String output_path = args[1];
         SparkSession spark = SparkSession
                 .builder()
                 .appName("Java Spark SQL basic example")
@@ -49,7 +55,7 @@ public class CreateHFiles {
 
         // write HFiles onto HDFS
         writables.saveAsNewAPIHadoopFile(
-                "/user/hadoop/tmphfiles",
+                output_path,
                 ImmutableBytesWritable.class,
                 KeyValue.class,
                 HFileOutputFormat2.class);
