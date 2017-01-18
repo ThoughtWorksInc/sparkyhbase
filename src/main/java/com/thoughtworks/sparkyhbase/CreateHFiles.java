@@ -4,40 +4,47 @@ import org.apache.hadoop.hbase.KeyValue;
 import org.apache.hadoop.hbase.io.ImmutableBytesWritable;
 import org.apache.hadoop.hbase.mapreduce.HFileOutputFormat2;
 import org.apache.hadoop.hbase.util.Bytes;
-import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
-import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.sql.Dataset;
+import org.apache.spark.sql.Row;
+import org.apache.spark.sql.SparkSession;
 import scala.Tuple2;
-
-import java.util.List;
 
 /**
  * http://www.opencore.com/blog/2016/10/efficient-bulk-load-of-hbase-using-spark/
  */
 /*
  spark-submit --jars `echo /usr/lib/hbase/*.jar | sed 's/ /,/g'` \
-     --class load.CreateHFiles ca-1.0-SNAPSHOT.jar
+     --class load.CreateHFiles sparkyhbase-1.0-SNAPSHOT.jar
  */
 public class CreateHFiles {
     public static void main(String[] args) {
-        SparkConf conf = new SparkConf().setAppName("Simple Application");
-        JavaSparkContext sc = new JavaSparkContext(conf);
-        String logFile = "foo"; // Should be some file on your system
-        JavaRDD<String> logData = sc.textFile(logFile).cache();
-        List<String> stuff = logData.collect();
+        if (args.length < 1) {
+            System.err.println("Need input data as argument");
+            System.exit(1);
+        }
+        String input_path = args[0];
+        SparkSession spark = SparkSession
+                .builder()
+                .appName("Java Spark SQL basic example")
+                .getOrCreate();
 
-        JavaRDD<KeyValue> keyvalues = logData.map((String x) -> new KeyValue(
-                        Bytes.toBytes("r5"),
+
+        Dataset<Row> inputData = spark.read().json(input_path)
+                .orderBy("id").cache();
+
+        JavaRDD<KeyValue> keyvalues = inputData.javaRDD().map((Row row) -> new KeyValue(
+                        Bytes.toBytes(row.getLong(row.fieldIndex("id"))),
                         Bytes.toBytes("f1"),  // column family
-                        Bytes.toBytes("c3"), // column qualifier (i.e. cell name)
-                        Bytes.toBytes(x)
+                        Bytes.toBytes("a"),
+                        Bytes.toBytes(row.getDouble(row.fieldIndex("a")))
                 )
         );
 
         JavaPairRDD<ImmutableBytesWritable, KeyValue> writables = keyvalues.mapToPair(
                 (KeyValue kv) -> new Tuple2<>(
-                    new ImmutableBytesWritable(kv.getRowArray()), kv)
+                        new ImmutableBytesWritable(kv.getRow()), kv)
         );
 
         // write HFiles onto HDFS
