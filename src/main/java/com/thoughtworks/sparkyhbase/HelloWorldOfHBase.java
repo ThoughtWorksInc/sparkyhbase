@@ -1,4 +1,4 @@
-package load;
+package com.thoughtworks.sparkyhbase;
 
 
 import org.apache.hadoop.conf.Configuration;
@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.NavigableMap;
 
 /* How to run me
-java -cp sparkyhbase-1.0-SNAPSHOT.jar:`hbase classpath` load.HelloWorldOfHBase
+java -cp sparkyhbase-1.0-SNAPSHOT.jar:`hbase classpath` com.thoughtworks.sparkyhbase.HelloWorldOfHBase
 */
 public class HelloWorldOfHBase {
     public static void main(String[] args) {

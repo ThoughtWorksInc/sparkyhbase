@@ -1,4 +1,4 @@
-package load;
+package com.thoughtworks.sparkyhbase;
 
 import org.apache.hadoop.hbase.KeyValue;
 import org.apache.hadoop.hbase.io.ImmutableBytesWritable;
@@ -16,7 +16,7 @@ import scala.Tuple2;
  */
 /*
  spark-submit --jars `echo /usr/lib/hbase/*.jar | sed 's/ /,/g'` \
-     --class load.CreateHFiles sparkyhbase-1.0-SNAPSHOT.jar
+     --class com.thoughtworks.sparkyhbase.CreateHFiles sparkyhbase-1.0-SNAPSHOT.jar
  */
 public class CreateHFiles {
     public static void main(String[] args) {
