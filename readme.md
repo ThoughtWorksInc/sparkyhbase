@@ -13,7 +13,7 @@ spark-submit --jars `echo /usr/lib/hbase/*.jar | sed 's/ /,/g'` \
 # Load HFiles into HBase
 
 ```
-hdfs dfs -chmod +w /user/hadoop/tmp-hfiles/
+hdfs dfs -chmod +w /user/hadoop/tmphfiles/
 hbase org.apache.hadoop.hbase.mapreduce.LoadIncrementalHFiles \
     -Dcreate.table=no /user/hadoop/tmphfiles/ tablename
 ```
